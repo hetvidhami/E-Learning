@@ -13,34 +13,37 @@ const loginUser = async (req , res) => {
 }
 
 const registerUser = async (req , res) => {
-    const {role , email , password} = req.body
-    const userExists = await vcUser.findOne({email , role})
+    try {
+        const {role , email , password} = req.body
+        const userExists = await vcUser.findOne({email , role})
+        if(userExists){
+            res.status(400).json({message: 'User already exists'})
+        }
 
-    // if(role.toLowerCase() !== 'user' || role.toLowerCase() !== 'admin'){
-    //     res.status(400).json({message : "Invalid Role" , role : role})
-    // }
+        const user = await vcUser.create({
+            role: role.toLowerCase(), 
+            email: email , 
+            password: password,
+        });
 
-    if(userExists){
-        res.status(400).json({message: 'user already exists'})
-    }
-
-    const user = await vcUser.create({
-        role , 
-        email , 
-        password
-    })
-
-    if(user) {
-        res.status(201).json({
-            message: 'User created successfully for VC',
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-        })
-    }
-    else {
-        res.status(400).json({message: 'Invalid data'})
-    }
+        if (user) {
+            res.status(201).json({
+            message: "User created successfully for Institute",
+            user: {
+                _id: user._id,
+                email: user.email,
+                role: user.role,
+            },
+            });
+        } else {
+            res.status(400).json({ message: "Invalid user data" });
+        }
+    } catch (error) {
+        if (error.code === 11000) {
+          return res.status(400).json({ message: "User already exists" });
+        }
+        res.status(500).json({ message: error.message });
+      }
 }
 
 export {

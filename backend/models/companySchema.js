@@ -5,7 +5,6 @@ const companySchema = mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true
     },
     password: {
         type: String,
@@ -14,7 +13,9 @@ const companySchema = mongoose.Schema({
     role: {
         type: String,
         required: true
-    }
+    },
+    otp: String,
+    otpExpires: Date,
 } , {
     timestamps: true
 })
